@@ -13,8 +13,8 @@ def ReadImage(InputImagePath):
 		# Getting the number of images present.
         NumOfImgs = len(os.listdir(InputImagePath))
 
-        if NumOfImgs == 0:
-            print("\nNo images present at the provided path.\n")
+        if NumOfImgs < 2:
+            print("\nSufficient number of images not found.\nProvide atleast 2 images.\n")
             exit()
 
         # Getting file extention (All image files must have same extention)
