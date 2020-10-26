@@ -35,8 +35,19 @@ def ReadImage(InputImagePath):
         
 
 
+def StitchImages(BaseImage, SecImage):
+    
+    
+    return StitchedImage
+
 
 if __name__ == "__main__":
     Images = ReadImage("InputImages/Field")            # Reading all input images
 
-    
+    # Setting the first base image on which the other images will be overlaped
+    BaseImage = Images[0]
+
+    for i in range(1, len(Images)):
+        StitchedImage = StitchImages(BaseImage, Images[i])
+
+        BaseImage = StitchedImage.copy()
