@@ -34,15 +34,32 @@ def ReadImage(InputImagePath):
     return Images
         
 
+def FindMatches(BaseImage, SecImage):
+    Sift = cv2.SIFT_create()
+    BaseImage_kp, BaseImage_des = Sift.detectAndCompute(cv2.cvtColor(BaseImage, cv2.COLOR_BGR2GRAY), None)
+    SecImage_kp, SecImage_des = Sift.detectAndCompute(cv2.cvtColor(SecImage, cv2.COLOR_BGR2GRAY), None)
 
+    BF_Matcher = cv2.BFMatcher()
+    InitialMatches = BF_Matcher.knnMatch(BaseImage_des, SecImage_des, k=2)
+
+    GoodMatches = []
+    for m, n in InitialMatches:
+        if m.distance < 0.75 * n.distance:
+            GoodMatches.append([m])
+
+    return GoodMatches, BaseImage_kp, SecImage_kp
+
+
+   
 def StitchImages(BaseImage, SecImage):
-    
-    
+    Matches, BaseImage_kp, SecImage_kp = FindMatches(BaseImage, SecImage)
+
+
     return StitchedImage
 
 
 if __name__ == "__main__":
-    Images = ReadImage("InputImages/Field")            # Reading all input images
+    Images = ReadImage("InputImages/Sun")            # Reading all input images
 
     # Setting the first base image on which the other images will be overlaped
     BaseImage = Images[0]
