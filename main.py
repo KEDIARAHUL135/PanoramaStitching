@@ -50,10 +50,30 @@ def FindMatches(BaseImage, SecImage):
     return GoodMatches, BaseImage_kp, SecImage_kp
 
 
-   
+
+def FindHomography(Matches, BaseImage_kp, SecImage_kp):
+    if len(Matches) < 4:
+        print("\nNot enough matches found between the images.\n")
+        exit(0)
+
+    BaseImage_pts = []
+    SecImage_pts = []
+    for Match in Matches:
+        BaseImage_pts.append(BaseImage_kp[Match[0].queryIdx].pt)
+        SecImage_pts.append(BaseImage_kp[Match[0].trainIdx].pt)
+
+    BaseImage_pts = np.float32(BaseImage_pts)
+    SecImage_pts = np.float32(SecImage_pts)
+
+    (HomographyMatrix, Status) = cv2.findHomography(SecImage_pts, BaseImage_pts, cv2.RANSAC, 4.0)
+
+    return HomographyMatrix, Status
+
+    
 def StitchImages(BaseImage, SecImage):
     Matches, BaseImage_kp, SecImage_kp = FindMatches(BaseImage, SecImage)
-
+    
+    HomographyMatrix, Status = FindHomography(Matches, BaseImage_kp, SecImage_kp)
 
     return StitchedImage
 
