@@ -60,7 +60,7 @@ def FindHomography(Matches, BaseImage_kp, SecImage_kp):
     SecImage_pts = []
     for Match in Matches:
         BaseImage_pts.append(BaseImage_kp[Match[0].queryIdx].pt)
-        SecImage_pts.append(BaseImage_kp[Match[0].trainIdx].pt)
+        SecImage_pts.append(SecImage_kp[Match[0].trainIdx].pt)
 
     BaseImage_pts = np.float32(BaseImage_pts)
     SecImage_pts = np.float32(SecImage_pts)
@@ -74,6 +74,10 @@ def StitchImages(BaseImage, SecImage):
     Matches, BaseImage_kp, SecImage_kp = FindMatches(BaseImage, SecImage)
     
     HomographyMatrix, Status = FindHomography(Matches, BaseImage_kp, SecImage_kp)
+    
+    StitchedImage = cv2.warpPerspective(SecImage, HomographyMatrix, (SecImage.shape[1] + BaseImage.shape[1], SecImage.shape[0]))
+
+    StitchedImage[0:BaseImage.shape[0], 0:BaseImage.shape[1]] = BaseImage
 
     return StitchedImage
 
