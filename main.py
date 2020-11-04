@@ -70,7 +70,7 @@ def FindHomography(Matches, BaseImage_kp, SecImage_kp):
     return HomographyMatrix, Status
 
     
-def GetNewFrameSize(HomographyMatrix, ImageShape):
+def GetNewFrameSizeAndMatrix(HomographyMatrix, ImageShape):
     (Height, Width) = ImageShape
     
     InitialMatrix = np.array([[0, Width - 1, Width - 1, 0],
@@ -96,7 +96,17 @@ def GetNewFrameSize(HomographyMatrix, ImageShape):
         New_Height -= min_y
         Correction[1] = abs(min_y)
     
-    return [New_Height, New_Width], Correction
+    x = np.add(x, Correction[0])
+    y = np.add(y, Correction[1])
+    OldInitialPoints = np.float32([[0, 0],
+                                   [Width - 1, 0],
+                                   [Width - 1, Height - 1],
+                                   [0, Height - 1]])
+    NewFinalPonts = np.float32(np.array([x, y]).transpose())
+    
+    HomographyMatrix = cv2.getPerspectiveTransform(OldInitialPoints, NewFinalPonts)
+    
+    return [New_Height, New_Width], Correction, HomographyMatrix
 
 
 
@@ -105,8 +115,8 @@ def StitchImages(BaseImage, SecImage):
     
     HomographyMatrix, Status = FindHomography(Matches, BaseImage_kp, SecImage_kp)
     
-    NewFrameSize, Correction = GetNewFrameSize(HomographyMatrix, SecImage.shape[:2])
-    
+    NewFrameSize, Correction, HomographyMatrix = GetNewFrameSizeAndMatrix(HomographyMatrix, SecImage.shape[:2])
+
     StitchedImage = cv2.warpPerspective(SecImage, HomographyMatrix, (SecImage.shape[1] + BaseImage.shape[1], SecImage.shape[0]))
 
     StitchedImage[0:BaseImage.shape[0], 0:BaseImage.shape[1]] = BaseImage
