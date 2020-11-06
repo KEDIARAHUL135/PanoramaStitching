@@ -119,19 +119,19 @@ def StitchImages(BaseImage, SecImage):
 
     StitchedImage = cv2.warpPerspective(SecImage, HomographyMatrix, (NewFrameSize[1], NewFrameSize[0]))
     StitchedImage[Correction[1]:Correction[1]+BaseImage.shape[0], Correction[0]:Correction[0]+BaseImage.shape[1]] = BaseImage
-    
+
     StitchedImage[0:BaseImage.shape[0], 0:BaseImage.shape[1]] = BaseImage
 
     return StitchedImage
 
 
 if __name__ == "__main__":
-    Images = ReadImage("InputImages/Sun")            # Reading all input images
+    # Reading the 2 images.
+    Image1 = cv2.imread("InputImages/Sun/1.jpg")
+    Image2 = cv2.imread("InputImages/Sun/2.jpg")
 
-    # Setting the first base image on which the other images will be overlaped
-    BaseImage = Images[0]
+    StitchedImage = StitchImages(Image1, Image2)
 
-    for i in range(1, len(Images)):
-        StitchedImage = StitchImages(BaseImage, Images[i])
-
-        BaseImage = StitchedImage.copy()
+    plt.imshow(StitchedImage)
+    plt.show()
+    
