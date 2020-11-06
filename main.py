@@ -122,6 +122,11 @@ if __name__ == "__main__":
     Image1 = cv2.imread("InputImages/Sun/1.jpg")
     Image2 = cv2.imread("InputImages/Sun/2.jpg")
 
+    # Checking if images read
+    if Image1 is None or Image2 is None:
+        print("\nImages not read properly or does not exist.\n")
+        exit(0)
+
     # Calling function for stitching images.
     StitchedImage = StitchImages(Image1, Image2)
 
