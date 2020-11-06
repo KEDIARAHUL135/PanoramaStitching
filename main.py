@@ -120,8 +120,6 @@ def StitchImages(BaseImage, SecImage):
     StitchedImage = cv2.warpPerspective(SecImage, HomographyMatrix, (NewFrameSize[1], NewFrameSize[0]))
     StitchedImage[Correction[1]:Correction[1]+BaseImage.shape[0], Correction[0]:Correction[0]+BaseImage.shape[1]] = BaseImage
 
-    StitchedImage[0:BaseImage.shape[0], 0:BaseImage.shape[1]] = BaseImage
-
     return StitchedImage
 
 
