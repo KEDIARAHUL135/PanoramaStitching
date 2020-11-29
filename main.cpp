@@ -60,10 +60,10 @@ void FindHomography(std::vector<cv::DMatch> Matches, std::vector<cv::KeyPoint> B
 
 
 
-void GetNewFrameSizeAndMatrix(cv::Mat &HomographyMatrix, int* ImageShape, int* NewFrameSize, int* Correction)
+void GetNewFrameSizeAndMatrix(cv::Mat &HomographyMatrix, int* Sec_ImageShape, int* Base_ImageShape, int* NewFrameSize, int* Correction)
 {
 	// Reading the size of the image
-	int Height = ImageShape[0], Width = ImageShape[1];
+	int Height = Sec_ImageShape[0], Width = Sec_ImageShape[1];
 
 	// Taking the matrix of initial coordinates of the corners of the secondary image
 	// Stored in the following format : [[x1, x2, x3, x4], [y1, y2, y3, y4], [1, 1, 1, 1]]
@@ -109,6 +109,11 @@ void GetNewFrameSizeAndMatrix(cv::Mat &HomographyMatrix, int* ImageShape, int* N
 		Correction[1] = abs(min_y);
 	}
 
+	// Again correcting New_Widthand New_Height
+	// Helpful when secondary image is overlaped on the left hand side of the Base image.
+	New_Width = (New_Width < Base_ImageShape[1] + Correction[0]) ? Base_ImageShape[1] + Correction[0] : New_Width;
+	New_Height = (New_Height < Base_ImageShape[0] + Correction[1]) ? Base_ImageShape[0] + Correction[1] : New_Height;
+
 
 	// Finding the coordinates of the corners of the image if they all were within the frame.
 	cv::add(x_by_c, Correction[0], x_by_c);
@@ -146,10 +151,11 @@ cv::Mat StitchImages(cv::Mat BaseImage, cv::Mat SecImage)
 	
 	
 	// Finding size of new frame of stitched images and updating the homography matrix
-	int ImageShape[2] = { SecImage.rows, SecImage.cols };
+	int Sec_ImageShape[2] = { SecImage.rows, SecImage.cols };
+	int Base_ImageShape[2] = { BaseImage.rows, BaseImage.cols };
 	int NewFrameSize[2], Correction[2];
 	//NewFrameSize, Correction, HomographyMatrix = 
-	GetNewFrameSizeAndMatrix(HomographyMatrix, ImageShape, NewFrameSize, Correction);
+	GetNewFrameSizeAndMatrix(HomographyMatrix, Sec_ImageShape, Base_ImageShape, NewFrameSize, Correction);
 
 	
 	// Finally placing the images upon one another.
