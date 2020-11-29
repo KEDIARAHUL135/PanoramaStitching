@@ -47,9 +47,9 @@ def FindHomography(Matches, BaseImage_kp, SecImage_kp):
     return HomographyMatrix, Status
 
     
-def GetNewFrameSizeAndMatrix(HomographyMatrix, ImageShape):
+def GetNewFrameSizeAndMatrix(HomographyMatrix, Sec_ImageShape, Base_ImageShape):
     # Reading the size of the image
-    (Height, Width) = ImageShape
+    (Height, Width) = Sec_ImageShape
     
     # Taking the matrix of initial coordinates of the corners of the secondary image
     # Stored in the following format: [[x1, x2, x3, x4], [y1, y2, y3, y4], [1, 1, 1, 1]]
@@ -82,6 +82,13 @@ def GetNewFrameSizeAndMatrix(HomographyMatrix, ImageShape):
         New_Height -= min_y
         Correction[1] = abs(min_y)
     
+    # Again correcting New_Width and New_Height
+    # Helpful when secondary image is overlaped on the left hand side of the Base image.
+    if New_Width < Base_ImageShape[1] + Correction[0]:
+        New_Width = Base_ImageShape[1] + Correction[0]
+    if New_Height < Base_ImageShape[0] + Correction[1]:
+        New_Height = Base_ImageShape[0] + Correction[1]
+
     # Finding the coordinates of the corners of the image if they all were within the frame.
     x = np.add(x, Correction[0])
     y = np.add(y, Correction[1])
@@ -107,7 +114,7 @@ def StitchImages(BaseImage, SecImage):
     HomographyMatrix, Status = FindHomography(Matches, BaseImage_kp, SecImage_kp)
     
     # Finding size of new frame of stitched images and updating the homography matrix 
-    NewFrameSize, Correction, HomographyMatrix = GetNewFrameSizeAndMatrix(HomographyMatrix, SecImage.shape[:2])
+    NewFrameSize, Correction, HomographyMatrix = GetNewFrameSizeAndMatrix(HomographyMatrix, SecImage.shape[:2], BaseImage.shape[:2])
 
     # Finally placing the images upon one another.
     StitchedImage = cv2.warpPerspective(SecImage, HomographyMatrix, (NewFrameSize[1], NewFrameSize[0]))
