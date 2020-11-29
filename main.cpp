@@ -73,7 +73,6 @@ void GetNewFrameSizeAndMatrix(cv::Mat &HomographyMatrix, int* ImageShape, int* N
 								   {1.0, 1.0, 1.0, 1.0} };
 	cv::Mat InitialMatrix = cv::Mat(3, 4, CV_64F, initialMatrix);// .inv();
 
-	//std::cout << InitialMatrix.rows << ", " << InitialMatrix.cols << ", " << InitialMatrix.type() << std::endl;
 
 	// Finding the final coordinates of the corners of the image after transformation.
 	// NOTE: Here, the coordinates of the corners of the frame may go out of the
@@ -85,9 +84,7 @@ void GetNewFrameSizeAndMatrix(cv::Mat &HomographyMatrix, int* ImageShape, int* N
 	cv::Mat y = FinalMatrix(cv::Rect(0, 1, FinalMatrix.cols, 1));
 	cv::Mat c = FinalMatrix(cv::Rect(0, 2, FinalMatrix.cols, 1));
 
-	//std::cout << x.at<double>(0, 0) << ", " << x.at<double>(0, 1) << ", " << x.at<double>(0, 2) << ", " << x.at<double>(0, 3) << ", " << std::endl;
-	//std::cout << c.at<double>(0, 0) << ", " << c.at<double>(0, 1) << ", " << c.at<double>(0, 2) << ", " << c.at<double>(0, 3) << ", " << std::endl;
-
+	
 	cv::Mat x_by_c = x.mul(1 / c);
 	cv::Mat y_by_c = y.mul(1 / c);
 
@@ -98,10 +95,7 @@ void GetNewFrameSizeAndMatrix(cv::Mat &HomographyMatrix, int* ImageShape, int* N
 	min_x = (int)round(min_x); max_x = (int)round(max_x);
 	min_y = (int)round(min_y); max_y = (int)round(max_y);
 
-	//std::cout << min_x << ", " << max_x << std::endl;
-	//std::cout << min_y << ", " << max_y << std::endl;
-
-
+	
 	int New_Width = max_x, New_Height = max_y;
 	Correction[0] = 0; Correction[1] = 0;
 	if (min_x < 0)
@@ -120,8 +114,6 @@ void GetNewFrameSizeAndMatrix(cv::Mat &HomographyMatrix, int* ImageShape, int* N
 	cv::add(x_by_c, Correction[0], x_by_c);
 	cv::add(y_by_c, Correction[1], y_by_c);
 
-	//std::cout << x_by_c.at<double>(0, 0) << ", " << x_by_c.at<double>(0, 1) << ", " << x_by_c.at<double>(0, 2) << ", " << x_by_c.at<double>(0, 3) << ", " << std::endl;
-	//std::cout << y_by_c.at<double>(0, 0) << ", " << y_by_c.at<double>(0, 1) << ", " << y_by_c.at<double>(0, 2) << ", " << y_by_c.at<double>(0, 3) << ", " << std::endl;
 
 	cv::Point2f OldInitialPoints[4], NewFinalPonts[4];
 	OldInitialPoints[0] = cv::Point2f(0, 0);
@@ -171,8 +163,8 @@ cv::Mat StitchImages(cv::Mat BaseImage, cv::Mat SecImage)
 int main()
 {
 	// Reading the 2 images.
-	cv::Mat Image1 = cv::imread("InputImages/Sun/1.jpg");
-	cv::Mat Image2 = cv::imread("InputImages/Sun/2.jpg");
+	cv::Mat Image1 = cv::imread("InputImages/Field/8.jpg");
+	cv::Mat Image2 = cv::imread("InputImages/Field/7.jpg");
 
 	// Checking if images read
 	if (Image1.empty() || Image2.empty())
